@@ -31,7 +31,7 @@ class AppConfig:
     mixed_motion_tolerance_seconds: float = 0.5
     still_tolerance_seconds: float = 0.5
     in_bed_active_alert_seconds: float = 4.0
-    out_of_bed_still_alert_seconds: float = 3.0
+    out_of_bed_still_alert_seconds: float = 2.75
     out_of_bed_no_person_alert_seconds: float | None = None
     grace_period_seconds: float = 0.0
     max_frames: int | None = 300

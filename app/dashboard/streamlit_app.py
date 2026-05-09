@@ -134,6 +134,10 @@ def _save_uploaded_video(uploaded_file) -> Path:
         return Path(handle.name)
 
 
+def _clip_id(index: int, name: str) -> str:
+    return f"{index:02d} | {name}"
+
+
 def _risk_chip(risk_detected: bool) -> str:
     if risk_detected:
         return '<span class="status-chip status-risk">Risk detected</span>'
@@ -198,6 +202,7 @@ def _build_overview_table(results: list[dict]) -> pd.DataFrame:
         event = result.events[0] if result.events else None
         rows.append(
             {
+                "clip_id": item["clip_id"],
                 "video_name": item["name"],
                 "risk": "Risk" if result.risk_detected else "Safe",
                 "event_count": len(result.events),
@@ -260,9 +265,9 @@ def _render_detail(selected_item: dict) -> None:
     meta2.metric("Triggered events", len(result.events))
     meta3.metric("State segments", len(result.state_segments))
 
-    if selected_item["video"] is not None:
+    if selected_item["video_bytes"] is not None:
         with st.expander("Preview Clip", expanded=False):
-            st.video(selected_item["video"])
+            st.video(selected_item["video_bytes"])
 
     if result.events:
         st.markdown("### Triggered Events")
@@ -332,7 +337,7 @@ with st.sidebar:
     room_id = st.text_input("Room ID", value="demo-room")
     bed_occupied = st.radio("Patient in bed?", options=[True, False], format_func=lambda value: "Yes" if value else "No")
     start_seconds = st.number_input("Start second", min_value=0.0, value=0.0, step=0.5)
-    end_seconds = st.number_input("End second", min_value=0.0, value=10.0, step=0.5)
+    end_seconds = st.number_input("End second", min_value=0.0, value=11.0, step=0.5)
 
     with st.expander("Detection Parameters", expanded=False):
         smooth_window_seconds = st.number_input("Short window (seconds)", min_value=0.5, value=1.0, step=0.5)
@@ -342,7 +347,7 @@ with st.sidebar:
         mixed_motion_tolerance_seconds = st.number_input("Mixed-motion tolerance (seconds)", min_value=0.0, value=0.5, step=0.1)
         still_tolerance_seconds = st.number_input("Still tolerance (seconds)", min_value=0.0, value=0.5, step=0.1)
         in_bed_active_alert_seconds = st.number_input("In-bed active alert (seconds)", min_value=0.5, value=4.0, step=0.5)
-        out_of_bed_still_alert_seconds = st.number_input("Out-of-bed still alert (seconds)", min_value=0.5, value=3.0, step=0.5)
+        out_of_bed_still_alert_seconds = st.number_input("Out-of-bed still alert (seconds)", min_value=0.25, value=2.75, step=0.25)
         grace_period_seconds = st.number_input("Out-of-bed grace period (seconds)", min_value=0.0, value=0.0, step=1.0)
 
     with st.expander("Optional VLM", expanded=False):
@@ -364,8 +369,8 @@ if uploaded_videos:
     for index, uploaded_video in enumerate(uploaded_videos):
         column = preview_columns[index % len(preview_columns)]
         with column:
-            st.markdown(f"**{uploaded_video.name}**")
-            st.video(uploaded_video)
+            st.markdown(f"**{_clip_id(index + 1, uploaded_video.name)}**")
+            st.video(uploaded_video.getvalue())
 
 run_clicked = st.button("Run Batch Analysis", type="primary", disabled=not uploaded_videos)
 
@@ -374,6 +379,7 @@ if run_clicked and uploaded_videos:
     progress = st.progress(0.0, text="Preparing analysis...")
 
     for index, uploaded_video in enumerate(uploaded_videos, start=1):
+        video_bytes = uploaded_video.getvalue()
         video_path = _save_uploaded_video(uploaded_video)
         progress.progress((index - 1) / len(uploaded_videos), text=f"Analyzing {uploaded_video.name} ({index}/{len(uploaded_videos)})")
         result = analyze_uploaded_video(
@@ -397,7 +403,14 @@ if run_clicked and uploaded_videos:
             openai_api_key=openai_api_key or None,
             openai_model=openai_model,
         )
-        results.append({"name": uploaded_video.name, "result": result, "video": uploaded_video})
+        results.append(
+            {
+                "clip_id": _clip_id(index, uploaded_video.name),
+                "name": uploaded_video.name,
+                "result": result,
+                "video_bytes": video_bytes,
+            }
+        )
 
     progress.progress(1.0, text="Batch analysis complete.")
     st.session_state["dashboard_batch_results"] = results
@@ -409,8 +422,8 @@ if results:
     st.markdown("### Batch Overview")
     st.dataframe(_build_overview_table(results), use_container_width=True, hide_index=True)
 
-    detail_names = [item["name"] for item in results]
+    detail_names = [item["clip_id"] for item in results]
     default_index = next((idx for idx, item in enumerate(results) if item["result"].risk_detected), 0)
     selected_name = st.selectbox("Detailed clip view", detail_names, index=default_index)
-    selected_item = next(item for item in results if item["name"] == selected_name)
+    selected_item = next(item for item in results if item["clip_id"] == selected_name)
     _render_detail(selected_item)
