@@ -19,6 +19,7 @@ class VideoLoader:
 
         fps = capture.get(cv2.CAP_PROP_FPS) or 30.0
         frame_index = 0
+        last_timestamp_seconds = -1.0
 
         try:
             while True:
@@ -27,12 +28,17 @@ class VideoLoader:
                     break
                 if max_frames is not None and frame_index >= max_frames:
                     break
+                pos_msec = capture.get(cv2.CAP_PROP_POS_MSEC)
+                timestamp_seconds = pos_msec / 1000.0 if pos_msec and pos_msec > 0 else None
+                if timestamp_seconds is None or timestamp_seconds <= last_timestamp_seconds:
+                    timestamp_seconds = frame_index / fps
                 yield FrameRecord(
                     index=frame_index,
-                    timestamp_seconds=frame_index / fps,
+                    timestamp_seconds=timestamp_seconds,
                     frame=frame,
                     source_id=self.video_path.name,
                 )
+                last_timestamp_seconds = timestamp_seconds
                 frame_index += 1
         finally:
             capture.release()
