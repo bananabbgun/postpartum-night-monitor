@@ -138,6 +138,42 @@ def _clip_id(index: int, name: str) -> str:
     return f"{index:02d} | {name}"
 
 
+def _analysis_signature(
+    uploaded_videos,
+    *,
+    room_id: str,
+    bed_occupied: bool,
+    start_seconds: float,
+    end_seconds: float,
+    smooth_window_seconds: float,
+    motion_low_threshold: float,
+    centroid_low_threshold: float,
+    centroid_high_threshold: float,
+    mixed_motion_tolerance_seconds: float,
+    still_tolerance_seconds: float,
+    in_bed_active_alert_seconds: float,
+    out_of_bed_still_alert_seconds: float,
+    grace_period_seconds: float,
+) -> tuple:
+    files = tuple((file.name, len(file.getvalue())) for file in (uploaded_videos or []))
+    return (
+        files,
+        room_id,
+        bed_occupied,
+        start_seconds,
+        end_seconds,
+        smooth_window_seconds,
+        motion_low_threshold,
+        centroid_low_threshold,
+        centroid_high_threshold,
+        mixed_motion_tolerance_seconds,
+        still_tolerance_seconds,
+        in_bed_active_alert_seconds,
+        out_of_bed_still_alert_seconds,
+        grace_period_seconds,
+    )
+
+
 def _risk_chip(risk_detected: bool) -> str:
     if risk_detected:
         return '<span class="status-chip status-risk">Risk detected</span>'
@@ -360,6 +396,27 @@ uploaded_videos = st.file_uploader(
     accept_multiple_files=True,
 )
 
+current_signature = _analysis_signature(
+    uploaded_videos,
+    room_id=room_id,
+    bed_occupied=bed_occupied,
+    start_seconds=start_seconds,
+    end_seconds=end_seconds,
+    smooth_window_seconds=smooth_window_seconds,
+    motion_low_threshold=motion_low_threshold,
+    centroid_low_threshold=centroid_low_threshold,
+    centroid_high_threshold=centroid_high_threshold,
+    mixed_motion_tolerance_seconds=mixed_motion_tolerance_seconds,
+    still_tolerance_seconds=still_tolerance_seconds,
+    in_bed_active_alert_seconds=in_bed_active_alert_seconds,
+    out_of_bed_still_alert_seconds=out_of_bed_still_alert_seconds,
+    grace_period_seconds=grace_period_seconds,
+)
+
+if st.session_state.get("dashboard_batch_signature") != current_signature:
+    st.session_state.pop("dashboard_batch_results", None)
+    st.session_state["dashboard_batch_signature"] = current_signature
+
 if uploaded_videos:
     names = ", ".join(file.name for file in uploaded_videos[:4])
     extra = "" if len(uploaded_videos) <= 4 else f" +{len(uploaded_videos) - 4} more"
@@ -414,6 +471,7 @@ if run_clicked and uploaded_videos:
 
     progress.progress(1.0, text="Batch analysis complete.")
     st.session_state["dashboard_batch_results"] = results
+    st.session_state["dashboard_batch_signature"] = current_signature
 
 results = st.session_state.get("dashboard_batch_results", [])
 
