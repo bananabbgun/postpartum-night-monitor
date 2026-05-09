@@ -332,7 +332,7 @@ with st.sidebar:
     room_id = st.text_input("Room ID", value="demo-room")
     bed_occupied = st.radio("Patient in bed?", options=[True, False], format_func=lambda value: "Yes" if value else "No")
     start_seconds = st.number_input("Start second", min_value=0.0, value=0.0, step=0.5)
-    end_seconds = st.number_input("End second", min_value=0.0, value=9.0, step=0.5)
+    end_seconds = st.number_input("End second", min_value=0.0, value=10.0, step=0.5)
 
     with st.expander("Detection Parameters", expanded=False):
         smooth_window_seconds = st.number_input("Short window (seconds)", min_value=0.5, value=1.0, step=0.5)
