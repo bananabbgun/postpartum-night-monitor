@@ -33,7 +33,7 @@ class AppConfig:
     in_bed_active_alert_seconds: float = 4.0
     out_of_bed_still_alert_seconds: float = 3.0
     out_of_bed_no_person_alert_seconds: float | None = None
-    grace_period_seconds: float = 30.0
+    grace_period_seconds: float = 0.0
     max_frames: int | None = 300
     save_debug_csv: bool = True
     save_events_jsonl: bool = True
