@@ -6,6 +6,7 @@ def classify_primitive_state(
     centroid_displacement: float | None,
     person_presence_ratio: float | None,
     motion_low_threshold: float,
+    still_centroid_threshold: float,
     centroid_low_threshold: float,
     centroid_high_threshold: float,
     person_presence_ratio_threshold: float,
@@ -19,7 +20,9 @@ def classify_primitive_state(
     ):
         return "no_person"
 
-    if local_motion_mean < motion_low_threshold:
+    if local_motion_mean < motion_low_threshold and (
+        centroid_displacement is None or centroid_displacement <= still_centroid_threshold
+    ):
         return "still"
 
     if centroid_displacement is None:

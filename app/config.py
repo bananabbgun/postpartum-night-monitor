@@ -25,6 +25,7 @@ class AppConfig:
     grayscale_threshold: int = 90
     area_threshold: int = 5
     motion_low_threshold: float = 4.0
+    still_centroid_threshold: float = 20.0
     centroid_low_threshold: float = 30.0
     centroid_high_threshold: float = 70.0
     person_presence_ratio_threshold: float = 0.4

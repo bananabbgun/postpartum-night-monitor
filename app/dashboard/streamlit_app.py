@@ -147,6 +147,7 @@ def _analysis_signature(
     end_seconds: float,
     smooth_window_seconds: float,
     motion_low_threshold: float,
+    still_centroid_threshold: float,
     centroid_low_threshold: float,
     centroid_high_threshold: float,
     mixed_motion_tolerance_seconds: float,
@@ -164,6 +165,7 @@ def _analysis_signature(
         end_seconds,
         smooth_window_seconds,
         motion_low_threshold,
+        still_centroid_threshold,
         centroid_low_threshold,
         centroid_high_threshold,
         mixed_motion_tolerance_seconds,
@@ -378,6 +380,7 @@ with st.sidebar:
     with st.expander("Detection Parameters", expanded=False):
         smooth_window_seconds = st.number_input("Short window (seconds)", min_value=0.5, value=1.0, step=0.5)
         motion_low_threshold = st.number_input("Motion low threshold", min_value=0.1, value=4.0, step=0.1)
+        still_centroid_threshold = st.number_input("Still centroid threshold", min_value=0.1, value=20.0, step=0.5)
         centroid_low_threshold = st.number_input("Centroid low threshold", min_value=0.1, value=30.0, step=0.5)
         centroid_high_threshold = st.number_input("Centroid high threshold", min_value=0.1, value=70.0, step=0.5)
         mixed_motion_tolerance_seconds = st.number_input("Mixed-motion tolerance (seconds)", min_value=0.0, value=0.5, step=0.1)
@@ -404,6 +407,7 @@ current_signature = _analysis_signature(
     end_seconds=end_seconds,
     smooth_window_seconds=smooth_window_seconds,
     motion_low_threshold=motion_low_threshold,
+    still_centroid_threshold=still_centroid_threshold,
     centroid_low_threshold=centroid_low_threshold,
     centroid_high_threshold=centroid_high_threshold,
     mixed_motion_tolerance_seconds=mixed_motion_tolerance_seconds,
@@ -447,6 +451,7 @@ if run_clicked and uploaded_videos:
             end_seconds=end_seconds if end_seconds > start_seconds else None,
             smooth_window_seconds=smooth_window_seconds,
             motion_low_threshold=motion_low_threshold,
+            still_centroid_threshold=still_centroid_threshold,
             centroid_low_threshold=centroid_low_threshold,
             centroid_high_threshold=centroid_high_threshold,
             mixed_motion_tolerance_seconds=mixed_motion_tolerance_seconds,

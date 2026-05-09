@@ -71,6 +71,7 @@ def run_pipeline(
             centroid_displacement=centroid_displacement,
             person_presence_ratio=person_presence_ratio,
             motion_low_threshold=config.motion_low_threshold,
+            still_centroid_threshold=config.still_centroid_threshold,
             centroid_low_threshold=config.centroid_low_threshold,
             centroid_high_threshold=config.centroid_high_threshold,
             person_presence_ratio_threshold=config.person_presence_ratio_threshold,
