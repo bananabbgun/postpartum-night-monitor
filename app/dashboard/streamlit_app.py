@@ -359,6 +359,13 @@ if uploaded_videos:
     names = ", ".join(file.name for file in uploaded_videos[:4])
     extra = "" if len(uploaded_videos) <= 4 else f" +{len(uploaded_videos) - 4} more"
     st.markdown(f'<p class="section-note">{len(uploaded_videos)} clip(s) ready: {names}{extra}</p>', unsafe_allow_html=True)
+    st.markdown("### Clip Preview Wall")
+    preview_columns = st.columns(min(3, len(uploaded_videos)))
+    for index, uploaded_video in enumerate(uploaded_videos):
+        column = preview_columns[index % len(preview_columns)]
+        with column:
+            st.markdown(f"**{uploaded_video.name}**")
+            st.video(uploaded_video)
 
 run_clicked = st.button("Run Batch Analysis", type="primary", disabled=not uploaded_videos)
 
