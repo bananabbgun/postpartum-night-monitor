@@ -1,0 +1,7 @@
+timestamp_seconds,bed_occupied
+0,true
+10,true
+20,false
+50,false
+80,true
+120,false
