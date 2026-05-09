@@ -414,12 +414,3 @@ if results:
     selected_name = st.selectbox("Detailed clip view", detail_names, index=default_index)
     selected_item = next(item for item in results if item["name"] == selected_name)
     _render_detail(selected_item)
-
-st.markdown(
-    """
-    <div class="section-note" style="margin-top: 1.25rem;">
-        Run locally with <code>streamlit run app/dashboard/streamlit_app.py</code>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
