@@ -101,7 +101,7 @@ with st.sidebar:
         mixed_motion_tolerance_seconds = st.number_input("Mixed-motion tolerance (seconds)", min_value=0.0, value=0.5, step=0.1)
         still_tolerance_seconds = st.number_input("Still tolerance (seconds)", min_value=0.0, value=0.5, step=0.1)
         in_bed_active_alert_seconds = st.number_input("In-bed active alert (seconds)", min_value=0.5, value=4.0, step=0.5)
-        out_of_bed_still_alert_seconds = st.number_input("Out-of-bed still alert (seconds)", min_value=0.5, value=4.0, step=0.5)
+        out_of_bed_still_alert_seconds = st.number_input("Out-of-bed still alert (seconds)", min_value=0.5, value=3.0, step=0.5)
         grace_period_seconds = st.number_input("Out-of-bed grace period (seconds)", min_value=0.0, value=30.0, step=1.0)
 
     with st.expander("Optional VLM", expanded=False):
