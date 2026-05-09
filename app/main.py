@@ -103,9 +103,10 @@ def run_pipeline(
         analyses.append(analysis)
 
         if event is not None:
+            window_frames = context.frame_buffer.sampled_frames(interval_seconds=1.0)
             vlm_result = summarize_risk_event(
                 event=event,
-                video_path=config.video_path if config.input_mode == "video" else None,
+                window_frames=window_frames,
                 api_key=vlm_api_key,
                 model=vlm_model,
             )
